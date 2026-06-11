@@ -1,8 +1,16 @@
 #include <iostream>
+#include <cmath>
+#include <ostream>
 
-bool isPrime(int n) {
-   for (int i = 2; i <= int(n/2); i++) {
-      if (n % i == 0) {
+bool IsPrime(int i) {
+   if (i <= 0) {
+      return false;
+   }
+   if (i % 2 == 0) {
+      return false;
+   }
+   for (int j = 0; j <= std::sqrt(i); j += 2) {
+      if (i % j == 0) {
 	 return false;
       }
    }
@@ -10,13 +18,14 @@ bool isPrime(int n) {
 }
 
 int main() {
-   int num;
+   int start;
    std::cout << "Enter a number: ";
-   std::cin >> num;
-   std::cout << "Iterating primes upto: " << num << std::endl; 
-   for (int i = 1; i <= num; i++) {
-      if (isPrime(i)) {
-	 std::cout << i << " is a prime" << std::endl;
+   std::cin >> start;
+
+   for (int i = 0; i <= start; i++) {
+      if (IsPrime(i)) {
+	 std::cout << i << ": is a prime" << std::endl;
       }
    }
+   return 0;
 }
