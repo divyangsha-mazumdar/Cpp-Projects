@@ -27,7 +27,7 @@ int main() {
       result = get_sqrt(i, 30);
       i++;
    }
-   
+
    std::cout << "No. of sqrts calculated: " << i << std::endl;
 
    return 0;
