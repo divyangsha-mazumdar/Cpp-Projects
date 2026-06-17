@@ -1,83 +1,61 @@
-#include <chrono>
 #include <iostream>
 #include <ctime>
-#include <ostream>
+#include <chrono>
+#include <iomanip>
 #include <string>
 #include <thread>
 #include <cstdlib>
 
-int timeOfday(int a) {
-   std::time_t now = std::time(nullptr);
-   std::string ph = "", pm = "", ps = "";
+int current_time_int() {
+   std::time_t ct = std::time(nullptr);
 
-   std::tm* tc = std::localtime(&now);
+   std::tm* local_time = std::localtime(&ct);
+   int current_time = (local_time->tm_hour * 3600) +
+		      (local_time->tm_min * 60) +
+		      (local_time->tm_sec);
+   return current_time;
+}
 
-   int hr = tc->tm_hour;
-
-   int min = tc->tm_min;
-   int sec = tc->tm_sec;
-   if (hr < 10) {
-      ph = "0";
-   }
-   
-   if (min < 10) {
-      pm = "0";
-   }
-   
-   if (sec < 10) {
-      ps = "0";
-   }
-   
-   if (a == 1) {
-      std::cout << "\rCurrent time:  " << ph << hr << ":" << pm << min << ":" << ps << sec << std::flush;
-      return (hr * 3600) + (min * 60) + sec;;
-   }
-   else {
-      return (hr * 3600) + (min * 60) + sec;
-   }
+int time_to_s(int h, int m, int s) {
+   return (h * 3600) + (m * 60) + s;
 }
 int main() {
-   int mhr,mmin,msec;
-   std::string padm = "", padh = "", pads = "";
+   int hr,min,sec;
+   int uhr,umin,usec;
 
-   std::cout << "Enter hrs: ";
-   std::cin >> mhr;
-   std::cout << "Enter mins: ";
-   std::cin >> mmin;
-   std::cout << "Enter secs: ";
-   std::cin >> msec;
+   std::cout << "Enter hour: ";
+   std::cin >> hr;
+   std::cout << "Enter minute: ";
+   std::cin >> min;
+   std::cout << "Enter seconds: ";
+   std::cin >> sec;
 
-   int current_time = timeOfday(0);
-   int utime = (mhr * 3600) + (mmin * 60) + msec;
-   int duration = utime - current_time;
+   int u_time = time_to_s(hr,min,sec);
+   std::cout << "Timer set for: " << std::setfill('0')
+	     << std::setw(2) << hr << ":"
+	     << std::setw(2) << min << ":"
+	     << std::setw(2) << sec << std::endl;
+   int current_time_now = current_time_int();
 
-   if (mhr < 10) {
-      padh = '0';
-   }
-   if (mmin < 10) {
-      padm = '0';
-   }
-   if (msec < 10) {
-      pads = '0';
-   }
+   while (current_time_now < u_time) {
+      current_time_now = current_time_int();
+      uhr = current_time_now / 3600;
+      umin = (current_time_now % 3600) / 60;
+      usec = current_time_now % 60;
 
-   if (duration < 0) {
-      duration += 86400;
-   }
-   
-   std::cout << std::endl;
-   std::cout << "Alarm set for: " << padh << mhr << ":" << padm << mmin << ":" << pads << msec 
-   << std::endl;
+      std::cout << "\rCurrent time:  " << std::setfill('0')
+	        << std::setw(2) << uhr << ":"
+		<< std::setw(2) << umin << ":"
+		<< std::setw(2) << usec << std::flush;
 
-   while (duration != 0) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-      timeOfday(1);
-      duration--;
+      std::this_thread::sleep_for(std::chrono::seconds(1));
    }
    std::cout << std::endl;
    std::cout << "Time finished!" << std::endl;
-   std::string command = "nohup sh -c 'while true; do play-audio test.wav; done' > /dev/null 2>&1 &";
+
+   std::string command = "nohup mpv --loop-file=inf test.wav > /dev/null 2>&1 &";
 
    int result = std::system(command.c_str());
+
    return 0;
 }
